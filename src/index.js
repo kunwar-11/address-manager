@@ -3,11 +3,13 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import setUpMockServer from './api/server'
-
+import {AddressProvider} from './context/addressContext'
 setUpMockServer();
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <AddressProvider>
+      <App />
+    </AddressProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

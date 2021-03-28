@@ -8,7 +8,7 @@ const data = [
         state: "Jharkhand",
         country: "India",
         pinCode: "826004",
-        phoneNumber: "7894561230"
+        mobile: "7894561230"
       },
       {
         id: 2,
@@ -18,7 +18,7 @@ const data = [
         state: "Bihar",
         country: "India",
         pinCode: "800001",
-        phoneNumber: "9876543210"
+        mobile: "9876543210"
       }
 ]
 export default function setUpMockServer() {
@@ -32,7 +32,7 @@ export default function setUpMockServer() {
         routes() {
             this.namespace = 'api';
             this.timing = 3000;
-            this.resource = 'addresses'
+            this.resource('addresses');
         },
         seeds(server) {
             data.forEach(each => {
@@ -44,7 +44,7 @@ export default function setUpMockServer() {
                     state : each.state,
                     country : each.country,
                     pinCode : each.pinCode,
-                    phoneNumber : each.phoneNumber
+                    mobile : each.mobile
                 })
             })
         }
