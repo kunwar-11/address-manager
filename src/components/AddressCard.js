@@ -1,9 +1,12 @@
 import axios from 'axios'
 import React, { useState } from 'react'
 import {useAddress} from '../context/addressContext'
+import { AddressForm } from './AddressForm'
 export const AddressCard = ({details : {id , name , area , city , state , country , mobile , pinCode}}) => {
     const [message , setMessage] = useState('')
     const {address , setAddress} = useAddress()
+    const [isEdit , setIsEdit] = useState(false)
+    const [edit , setEdit] = useState({})
     const removeAddressHandler = async (id) => {
         try {
             setMessage('Please Wait.....')
@@ -18,9 +21,14 @@ export const AddressCard = ({details : {id , name , area , city , state , countr
             setMessage('')
         }
     }
+    const editHandler = (address) => {
+        setIsEdit(true)
+        setEdit(address)
+    }
     return (
         <>
-         <small className="text__muted">{message}</small>
+        {isEdit && <AddressForm editAddress = {edit} setIsEdit = {setIsEdit} />}
+         {!isEdit && <><small className="text__muted">{message}</small>
         <div className = 'card card__text' style = {{display : 'flex' , justifyContent : 'space-between' , backgroundColor : 'white' , margin : '1rem'}}>
            
             <div className="card__body__container">
@@ -30,10 +38,10 @@ export const AddressCard = ({details : {id , name , area , city , state , countr
             <p className="card__body">{`Phone : ${mobile}`}</p>
         </div>
         <div style = {{display : 'flex' , justifyContent : 'space-evenly'}}>
-            <button className="btn btn-primary">Edit</button>
+            <button className="btn btn-primary" onClick = {() => editHandler({id , name , area , city , state , country , pinCode , mobile})}>Edit</button>
             <button className="btn btn-secondary" onClick = {() => removeAddressHandler(id)}>Remove</button>
         </div>
-        </div>
+        </div></>}
         </>
     )
 }

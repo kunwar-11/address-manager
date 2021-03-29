@@ -3,15 +3,25 @@ import axios from 'axios';
 import '../styles/form.css'
 import {countryList , states} from '../database'
 import {useAddress} from '../context/addressContext'
-export const AddressForm = () => {
-    const [name , setName] = useState('')
-    const [area , setArea] = useState('')
-    const [city , setCity] = useState('')
-    const [pinCode , setPinCode] = useState('')
-    const [mobile , setMobile] = useState('')
+const defaultAddress = {
+    name: "",
+    mobile: "",
+    pinCode: "",
+    area: "",
+    city: "",
+    state: states[3],
+    country: countryList[102]
+  };
+  
+export const AddressForm = ({editAddress = defaultAddress , setIsEdit}) => {
+    const [name , setName] = useState(editAddress.name)
+    const [area , setArea] = useState(editAddress.area)
+    const [city , setCity] = useState(editAddress.city)
+    const [pinCode , setPinCode] = useState(editAddress.pinCode)
+    const [mobile , setMobile] = useState(editAddress.mobile)
     const [errorMessage , setErrorMessage] = useState({})
-    const [country , setCountry] = useState(countryList[102])
-    const [state , setState] = useState(states[3])
+    const [country , setCountry] = useState(editAddress.country)
+    const [state , setState] = useState(editAddress.state)
     const [messages , setMessages] = useState('')
     const {setAddress , setIsForm} = useAddress()
     const formValidation = () => {
@@ -93,6 +103,25 @@ export const AddressForm = () => {
         }
 
     }
+    const formEditHandler = async (e) => {
+        e.preventDefault()
+        const {data : {address} , status} = await axios.put(`/api/addresses/${editAddress.id}` , {
+            address: { 
+                name,
+                area,
+                city,
+                state,
+                country,
+                pinCode,
+                mobile
+            }
+        })
+        console.log(address , status)
+        if(status === 200) {
+            setAddress(prev =>  prev.map(each =>   each.id === address.id ? address : each ))
+            setIsEdit(false)
+        }
+    }
     const formResetHandler = () => {
         setName('');
         setPinCode('')
@@ -101,7 +130,7 @@ export const AddressForm = () => {
         setArea('')
     }
     return (
-        <form className = 'form' onSubmit = {formSubmitHandler}>
+        <form className = 'form' onSubmit = {editAddress.name.length === 0 ? formSubmitHandler : formEditHandler}>
             {/* <div className={`input`}>
             <input type="text" ref = {val} className={`inputText ${error === 'error' ? 'error' : ''}`} placeholder="Enter Name"/>
             <small className="error__message">there is an error</small>
