@@ -1,10 +1,9 @@
-import React , {useEffect, useRef , useState} from 'react';
+import React , {useState} from 'react';
 import axios from 'axios';
 import '../styles/form.css'
 import {countryList , states} from '../database'
 import {useAddress} from '../context/addressContext'
 export const AddressForm = () => {
-    const val = useRef();
     const [name , setName] = useState('')
     const [area , setArea] = useState('')
     const [city , setCity] = useState('')
@@ -13,10 +12,8 @@ export const AddressForm = () => {
     const [errorMessage , setErrorMessage] = useState({})
     const [country , setCountry] = useState(countryList[102])
     const [state , setState] = useState(states[3])
-    useEffect(() => {
-        val.current.focus()
-    },[])
-    const {setAddress} = useAddress()
+    const [messages , setMessages] = useState('')
+    const {setAddress , setIsForm} = useAddress()
     const formValidation = () => {
         let valid = true;
         if(name.trim()) {
@@ -68,6 +65,7 @@ export const AddressForm = () => {
     const formSubmitHandler = async (e) => {
         e.preventDefault()
         if(formValidation()) {
+                setMessages('saving address please wait....')
                 try {
                     const {data : {address} , status} = await axios.post('/api/addresses' , {
                         address: { 
@@ -83,24 +81,34 @@ export const AddressForm = () => {
                     
                 if(status === 201) {
                     setAddress(prev => prev.concat(address))
+                    setIsForm(false)
                 }
                     console.log(address , status)
                 } catch (error) {
-                    
+                    alert(error)
                 }
                 finally {
-
+                    setMessages('')
                 }
         }
 
     }
-
+    const formResetHandler = () => {
+        setName('');
+        setPinCode('')
+        setMobile('')
+        setCity('')
+        setArea('')
+    }
     return (
         <form className = 'form' onSubmit = {formSubmitHandler}>
             {/* <div className={`input`}>
             <input type="text" ref = {val} className={`inputText ${error === 'error' ? 'error' : ''}`} placeholder="Enter Name"/>
             <small className="error__message">there is an error</small>
             </div> */}
+            <div className="input">
+                <small className="text__muted">{messages}</small>
+            </div>
             <div className="input">
             <select className = 'inputText' value = {country} onChange = {(e) => setCountry(e.target.value)}>
                 {countryList.map((countryName) => (
@@ -111,7 +119,7 @@ export const AddressForm = () => {
             </select>
             </div>
             <div className={`input`}>
-            <input type="text" ref = {val} value = {name} className={`inputText`} onChange = {(e) => setName(e.target.value)} placeholder="Enter Name" />
+            <input type="text" value = {name} className={`inputText`} onChange = {(e) => setName(e.target.value)} placeholder="Enter Name" />
                  <small className="error__message">{errorMessage.name_error}</small>
             </div>
             <div className="input">
@@ -141,7 +149,7 @@ export const AddressForm = () => {
             </div>
             <div className="button">
                 <button className="btn btn-primary-success" type = 'submit'>Save</button>
-                <button className="btn btn-primary-danger">Reset</button>
+                <button className="btn btn-primary-danger" onClick = {formResetHandler}>Reset</button>
             </div>
         </form>
     )

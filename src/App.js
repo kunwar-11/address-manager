@@ -6,22 +6,22 @@ import axios from 'axios'
 function App() {
   const {address , setAddress, isForm , setIsForm} = useAddress()
   const [loading , setLoading] = useState('loaded')
-  const fetchData = async () => {
-    try {
-      setLoading('loading')
-      const {data : {addresses}} = await axios.get('/api/addresses');
-      console.log(addresses)
-      setAddress(prev => prev.concat(addresses))
-    } catch (error) {
-       alert(error)
-    }
-    finally {
-      setLoading('loaded')
-    }
-  }
+  
   useEffect(() => {
-      fetchData()
-  }, [])
+    (async () => {
+      try {
+        setLoading('loading')
+        const {data : {addresses}} = await axios.get('/api/addresses');
+        console.log(addresses)
+        setAddress(prev => prev.concat(addresses))
+      } catch (error) {
+         alert(error)
+      }
+      finally {
+        setLoading('loaded')
+      }
+    })()
+  }, [setAddress])
   return (
     <div className="App">
         <button onClick = {() => setIsForm(!isForm)}>{!isForm ? "Add New Address" : "Back To Your Address"}</button>
